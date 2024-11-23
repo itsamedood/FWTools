@@ -1,3 +1,4 @@
+from frames.mainFrame import MainFrame
 from PIL import Image, ImageTk
 from sys import exit
 from tkinter import Frame, Tk, messagebox
@@ -27,10 +28,19 @@ class GUI(Tk):
 
     # Add each frame here.
     for F in (
-      ...
+      MainFrame,
     ):
       name = F.__name__
       frame = F(self.container, self)
+      frame.grid(row=0, column=0, sticky="nsew")
+
+      self.frames[name] = frame
+
+    self.show_frame("MainFrame")
+
+  def show_frame(self, _frame_name: str) -> None:
+    try: self.frames[_frame_name].tkraise()
+    except KeyError: raise Exception("%s FRAME DOESN'T EXIST." %_frame_name)
 
   def on_esc(self, _event):
     if _event.keysym == "Escape": exit(0)
