@@ -1,5 +1,5 @@
 from PIL import Image, ImageTk
-from tkinter import Button, Frame, Label
+from tkinter import Frame, Label
 
 
 class MainFrame(Frame):

@@ -40,7 +40,7 @@
     {
       "label": "Run package.sh",
       "type": "shell",
-      "command": "zsh package.sh", // Runs the package shell script.
+      "command": "sh package.sh", // Runs the package shell script.
       "group": {
         "kind": "build",
         "isDefault": true

@@ -16,7 +16,6 @@ class GUI(Tk):
     # The app will be `Python` but PyInstaller will rename the exec. to `FWTools`.
     self.title("FWTools")
     self.geometry("640x480")
-    self.configure(bg="gray")
     self.attributes("-alpha", 0.8)  # Make window a bit transparent.
     self.resizable(False, False)
 
