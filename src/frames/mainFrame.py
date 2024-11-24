@@ -19,7 +19,7 @@ class MainFrame(Frame):
 
 
     logo_label = Label(self, image=self.logo)
-    title_label = Label(self, text="FWTools - © 2024, itsamedood", pady=10, font=("Futura", 25))
+    title_label = Label(self, text="Select a slot to get started.", pady=10, font=("Futura", 25))
 
     # Add elements.
     logo_label.grid(row=0, column=0, columnspan=2)

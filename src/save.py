@@ -1,4 +1,12 @@
+from os import getenv
+from platform import system as sysname
+
+
 class Save:
+  spath: str
+  ipath: str
+  slot = 0
+
   wdata = {
     "newgame": 0,
     "mode": 1,  # 1=adventure, 2=fixed-party.
@@ -89,10 +97,22 @@ class Save:
     "beatgame1": 0,  # Security trophy.
     "beatgame2": 0,  # Animdude trophy.
     "beatgame3": 0,  # Chippers revenge trophy.
-    "beatgame4": 0,  # 4th layer trophy
-    "beatgame5": 0,  # Clock ending trophy
+    "beatgame4": 0,  # 4th layer trophy.
+    "beatgame5": 0,  # Clock ending trophy.
     "beatgame6": 0,  # Universe end trophy.
     "beatgame7": 0,  # Chicas magic rainbow trophy.
     "gotpearl": 0,   # Pearl trophy.
     "all": 0         # Fan trophy.
   }
+
+  def __init__(self) -> None:
+    os = sysname()  # Windows | Linux | Darwin
+
+    match os:
+      case "Windows":
+        base_path = "%s\\MMFApplications" %getenv("APPDATA")
+        self.spath = f"{base_path}\\fnafw{self.slot}"
+        self.ipath = "%s\\info" %base_path
+
+      case "Linux": ...
+      case "Darwin": ...
