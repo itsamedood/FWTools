@@ -9,7 +9,7 @@
 > FWTools is a GUI cheat menu for FNaF World!
 >
 > Honestly, made just because FNaF World saves (and all FNaF game saves for that matter)
-> are basic plaintext, making them easy to modify.
+> are basic plaintext, making them easy to modify. Plus it was a good excuse to learn tkinter.
 
 # How are these save files structured?
 > Yes, at first glance the saves are confusing since almost everything is shortened down, even to

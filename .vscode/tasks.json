@@ -1,0 +1,50 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Test GUI",
+      "type": "shell",
+      "command": "python3 -B src/gui.py", // Runs the GUI with python3.
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "Test CLI",
+      "type": "shell",
+      "command": "python3 -B src/cli.py", // Runs the CLI with python3.
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "Run GUI",
+      "type": "shell",
+      "command": "./bin/darwin/FWTools", // Runs the compiled GUI.
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "Run CLI",
+      "type": "shell",
+      "command": "./bin/darwin/FWTools-cli", // Runs the compiled CLI.
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "Run package.sh",
+      "type": "shell",
+      "command": "zsh package.sh", // Runs the package shell script.
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+  ]
+}
