@@ -17,7 +17,7 @@ function mkbin() {
 # Compile `src/gui.py`.
 function compilegui() {
   echo "Compiling 'src/gui.py'..."
-  pyinstaller --onefile --add-data "assets/logos/FWToolslogo.png;assets/logos" --distpath $bin --name $exename $guipath
+  pyinstaller --onefile --distpath $bin --name $exename $guipath
 }
 
 # Compile `src/cli.py`.
