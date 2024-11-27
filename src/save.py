@@ -3,11 +3,11 @@ from platform import system as sysname
 
 
 class Save:
-  spath: str
-  ipath: str
+  spath: str  # Save file path.
+  ipath: str  # Info file path.
   slot = 0
 
-  wdata = {
+  sdata = {  # Save data.
     "newgame": 0,
     "mode": 1,  # 1=adventure, 2=fixed-party.
     "diff": 2,  # 1=normal, 2=hard.
@@ -38,62 +38,64 @@ class Save:
     "hour": 0,
 
     # Characters.
-    "1have": 1,
-    "2have": 1,
-    "3have": 1,
-    "4have": 1,
-    "5have": 1,
-    "6have": 1,
-    "7have": 1,
-    "8have": 1,
-    "9have": 0,
-    "10have": 0,
-    "11have": 0,
-    "12have": 0,
-    "13have": 0,
-    "14have": 0,
-    "15have": 0,
-    "16have": 0,
-    "17have": 0,
-    "18have": 0,
-    "19have": 0,
-    "20have": 0,
-    "21have": 0,
-    "22have": 0,
-    "23have": 0,
-    "24have": 0,
-    "25have": 0,
-    "26have": 0,
-    "27have": 0,
-    "28have": 0,
-    "29have": 0,
-    "30have": 0,
-    "31have": 0,
-    "32have": 0,
-    "33have": 0,
-    "34have": 0,
-    "35have": 0,
-    "36have": 0,
-    "37have": 0,
-    "38have": 0,
-    "39have": 0,
-    "40have": 0,
-    "41have": 0,
-    "42have": 0,
-    "43have": 0,
-    "44have": 0,
-    "45have": 0,
-    "46have": 0,
-    "47have": 0,
-    "48have": 0,
+    "1have": 1,   # Freddy.
+    "2have": 1,   # Bonnie.
+    "3have": 1,   # Chica.
+    "4have": 1,   # Foxy.
+    "5have": 1,   # Toy Bonnie.
+    "6have": 1,   # Toy Chica.
+    "7have": 1,   # Toy Freddy.
+    "8have": 1,   # Mangle.
+    "9have": 0,   # BB.
+    "10have": 0,  # JJ.
+    "11have": 0,  # Phantom Freddy.
+    "12have": 0,  # Phantom Chica.
+    "13have": 0,  # Phantom BB.
+    "14have": 0,  # Phantom Foxy.
+    "15have": 0,  # Phantom Mangle.
+    "16have": 0,  # Withered Bonnie.
+    "17have": 0,  # Withered Chica.
+    "18have": 0,  # Withered Freddy.
+    "19have": 0,  # Withered Foxy.
+    "20have": 0,  # Shadow Freddy.
+    "21have": 0,  # Marionette.
+    "22have": 0,  # Phantom Marionette.
+    "23have": 0,  # Golden Freddy.
+    "24have": 0,  # Paper Pals.
+    "25have": 0,  # Nighmare Freddy.
+    "26have": 0,  # Nightmare Bonnie.
+    "27have": 0,  # Nightmare Chica.
+    "28have": 0,  # Nightmare Foxy.
+    "29have": 0,  # Endo 01.
+    "30have": 0,  # Endo 02.
+    "31have": 0,  # Plushtrap.
+    "32have": 0,  # Endoplush.
+    "33have": 0,  # Springtrap.
+    "34have": 0,  # RWQFSFASXC.
+    "35have": 0,  # Crying Child.
+    "36have": 0,  # Funtime Freddy.
+    "37have": 0,  # Nightmare Fredbear.
+    "38have": 0,  # Nightmare.
+    "39have": 0,  # Fredbear.
+    "40have": 0,  # Spring Bonnie.
+    "41have": 0,  # Jack-O-Bonnie.
+    "42have": 0,  # Jack-O-Chica.
+    "43have": 0,  # Animdude.
+    "44have": 0,  # Mr. Chipper.
+    "45have": 0,  # Nightmare BB.
+    "46have": 0,  # Nightmarionne.
+    "47have": 0,  # Coffee.
+    "48have": 0,  # Purple Guy.
   }
 
-  idata = {
-    "first": 1,
-    "mode&": 0,
+  # & = save slot (mode1, diff2, etc.)
+  idata = {  # Info data.
+    "first": 1,  # 1 if you've seen the opening cutscene.
+    "mode&": 0,  # 1=adventure, 2=fixed party.
+    # 1=Normal, 2=Hard (you can set this to anything as it's just a multiplier.)
     "diff&": 0,
-    "hour&": 0,
-    "min&": 0,
+    "hour&": 0,  # Hours played on save.
+    "min&": 0,  # Minutes played on save.
     "beatgame1": 0,  # Security trophy.
     "beatgame2": 0,  # Animdude trophy.
     "beatgame3": 0,  # Chippers revenge trophy.
@@ -115,4 +117,7 @@ class Save:
         self.ipath = "%s\\info" %base_path
 
       case "Linux": ...
-      case "Darwin": ...
+      case "Darwin":
+        base_path = f"{getenv("HOME")}/.wine/drive_c/users/{getenv("USERNAME")}/AppData/Roaming/MMFApplications"
+        self.spath = f"{base_path}/fnafw{self.slot}"
+        self.ipath = "%s/info" %base_path
