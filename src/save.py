@@ -116,8 +116,8 @@ class Save:
         self.spath = f"{base_path}\\fnafw{self.slot}"
         self.ipath = "%s\\info" %base_path
 
-      case "Linux": ...
-      case "Darwin":
+      # Can only assume Linux would work the same way as I can't get WINE to run on my Ubuntu install :(
+      case "Darwin" | "Linux":
         base_path = f"{getenv("HOME")}/.wine/drive_c/users/{getenv("USERNAME")}/AppData/Roaming/MMFApplications"
         self.spath = f"{base_path}/fnafw{self.slot}"
         self.ipath = "%s/info" %base_path
