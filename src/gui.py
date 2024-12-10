@@ -1,7 +1,9 @@
+from frames.characterFrame import CharacterFrame
 from frames.mainFrame import MainFrame
+from frames.selectedFrame import SelectedFrame
 from PIL import Image, ImageTk
-from save import Save
 from tkinter import Frame, Menu, Tk, messagebox
+from util import Util
 
 
 class GUI(Tk):
@@ -10,7 +12,6 @@ class GUI(Tk):
   def __init__(self, *args, **kwargs) -> None:
     Tk.__init__(self, *args, **kwargs)
     self.bind("<Key>", self.on_esc)
-    self.selected_slot = Save()
 
     # Initialize main window.
     # The app will be `Python` but PyInstaller will rename the exec. to `FWTools`.
@@ -34,6 +35,8 @@ class GUI(Tk):
     # Add each frame here.
     for F in (
       MainFrame,
+      SelectedFrame,
+      CharacterFrame
     ):
       name = F.__name__
       frame = F(self.container, self)
@@ -79,14 +82,17 @@ class GUI(Tk):
     ...
 
   def onefiftyseven(self) -> None:
-    if (self.selected_slot.slot == 0): self.err("Error", "Select a slot!")
+    if (Util.save.slot == 0): self.err("Error", "Select a slot!")
     else:
       if self.confirm("Confirm", "Are you sure you want to override your file to 157%?"):
-        print("set slot %s to 157%% file" %self.selected_slot.slot)
+        print("set slot %s to 157%% file" %Util.save.slot)
 
   def select_slot(self, _slot: int) -> None:
-    self.selected_slot.slot = _slot
-    self.selected_slot.spath = f"{self.selected_slot.spath[:-1]}{_slot}"
+    Util.save.slot = _slot
+    Util.save.spath = f"{Util.save.spath[:-1]}{_slot}"
+    selected_frame = self.frames["SelectedFrame"]
+    selected_frame.update_display()
+    self.show_frame("SelectedFrame")
 
   # def select_slot_one(self):
   #   self.selected_slot = 1
@@ -125,7 +131,7 @@ def setup_menu(_gui: GUI) -> Menu:
   extra_menu.add_command(label="Replay First Cutscene", command=lambda: print("set first=0 in info"))
 
   # Debug cascade.
-  debug_menu.add_command(label="Show Selected Slot", command=lambda: gui.err("Selected Slot:", f"{gui.selected_slot.spath}"))
+  debug_menu.add_command(label="Show Selected Slot", command=lambda: gui.err("Selected Slot:", f"{Util.save.spath}"))
 
   return menu
 
