@@ -1,6 +1,6 @@
 <center>
 
-![FWToolslogo](assets/logos/FWToolslogo.png)
+![FWToolslogo](assets/images/logos/FWToolslogo.png)
 
 </center>
 
