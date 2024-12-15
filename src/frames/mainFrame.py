@@ -13,7 +13,7 @@ class MainFrame(Frame):
     self.columnconfigure(1, weight=1)
 
     # Create elements.
-    oplogo = Image.open("assets/logos/FWToolslogo.png")
+    oplogo = Image.open("assets/images/logos/FWToolslogo.png")
     rslogo = oplogo.resize(size=(210, 160))
     self.logo = ImageTk.PhotoImage(image=rslogo)
 

@@ -1,4 +1,7 @@
+from os import scandir
 from platform import system
+from PIL import Image, ImageTk, ImageEnhance
+from random import randint
 from tkinter import Canvas, Event, Frame, Label, Scrollbar
 from util import Util
 
@@ -11,7 +14,7 @@ class CharacterFrame(Frame):
     self.grid_rowconfigure(0, weight=1)
     self.grid_columnconfigure(0, weight=1)
 
-    self.canvas = Canvas(self, bg="red", width=self.controller.winfo_width(), height=self.controller.winfo_height())
+    self.canvas = Canvas(self, width=self.controller.winfo_width(), height=self.controller.winfo_height())
     self.canvas.grid(row=0, column=0, sticky="nsew")
     scrollbar = Scrollbar(self, orient="vertical", command=self.canvas.yview)
     scrollbar.grid(row=0, column=1, sticky="ns")
@@ -21,12 +24,56 @@ class CharacterFrame(Frame):
     self.canvas.configure(yscrollcommand=scrollbar.set)
     self.canvas.create_window(0, 0, window=scrollable_frame, anchor="nw")
 
-    for i in range(30):
-      label = Label(scrollable_frame, text=f"Label {i}", font=("Futura", 25))
-      label.grid(row=i, column=0, pady=2, padx=5)
+    # PIL Image, PhotoImage for display, Label that displays the image, and "locked" state.
+    self.portrait_imgs: list[tuple[Image.ImageFile.ImageFile, ImageTk.PhotoImage, Label, bool]] = []
+    base_path = "assets/images/portraits"
+    portraits = [f"{base_path}/{p.name}" for p in scandir(base_path)]
+    row, column = 0, 1
+    portraits.sort()  # Well that was easy!
+
+    # Add character portraits (5 per row).
+    for portrait in portraits:
+      og_img = Image.open(portrait)
+      portrait_img = ImageTk.PhotoImage(og_img)
+      portrait_label = Label(scrollable_frame, image=portrait_img)
+
+      portrait_label.bind("<Button-1>", lambda _e, _i=len(self.portrait_imgs): self.on_portrait_click(_i))
+
+      self.portrait_imgs.append((og_img, portrait_img, portrait_label, False))
+
+    for og_img, img, lbl, locked in self.portrait_imgs:
+      lbl.grid(row=row, column=column)
+      if column % 5 == 0:
+        row += 1
+        column = 1
+      else: column += 1
+
+    # Make locked characters more transparent, and unlocked, leave alone.
+    for i, (og_img, img, lbl, locked) in enumerate(self.portrait_imgs):
+      # For now, random chance to be "locked" (lol).
+      if randint(1, 5) == 1:
+        enhancer = ImageEnhance.Brightness(og_img)
+        locked = enhancer.enhance(0.5)
+        locked_img = ImageTk.PhotoImage(locked)
+
+        lbl.configure(image=locked_img)
+        self.portrait_imgs[i] = (og_img, locked_img, lbl, True)
 
     scrollable_frame.bind("<Configure>", self.update_scrollregion)
     self.canvas.bind_all("<MouseWheel>", self.on_scroll)
+
+  def on_portrait_click(self, _portrait: int):
+    """ Triggers when a portrait is clicked on. Toggles "locked" (transparent) or "unlocked". """
+    og_img, img, lbl, locked = self.portrait_imgs[_portrait]
+    locked = not locked
+
+    limg = ImageTk.PhotoImage(
+      ImageEnhance.Brightness(og_img).enhance(1)) if not locked else ImageTk.PhotoImage(
+        ImageEnhance.Brightness(og_img).enhance(0.5))
+
+    lbl.configure(image=limg)
+
+    self.portrait_imgs[_portrait] = (og_img, limg, lbl, locked)
 
   def update_scrollregion(self, _e):
     self.canvas.configure(scrollregion=self.canvas.bbox("all"))
@@ -34,9 +81,17 @@ class CharacterFrame(Frame):
   def on_scroll(self, _e: Event):
     # Windows & MacOS scroll.
     if _e.delta:
-      self.canvas.yview_scroll(-1 if _e.delta > 0 else 1, "units")
+      if system() == "Darwin":
+        # Best I could do to make the scrolling not awful on MacOS.
+        # Calculate a fraction to scroll.
+        scroll_fraction = _e.delta / 300  # Adjust divisor for finer scrolling (larger = slower).
+        current_view = self.canvas.yview()
+        new_view_start = max(0, min(1, current_view[0] - scroll_fraction))  # Clamp between 0 and 1.
+        self.canvas.yview_moveto(new_view_start)
 
-    # Scroll up.
+      # Supposedly the issue isn't present on Windows, but I'll test that.
+      else: self.canvas.yview_scroll(-1 if _e.delta > 0 else 1, "units")
+
+    # 4 = scrollwheel up. | 5 = scrollwheel down.
     elif _e.num == 4: self.canvas.yview_scroll(-1, "units")
-    # Scroll down.
     elif _e.num == 5: self.canvas.yview_scroll(1, "units")

@@ -107,6 +107,9 @@ class Save:
     "all": 0         # Fan trophy.
   }
 
+  # Changes to be made.
+  staged: tuple[dict[str, int], dict[str, int]]
+
   def __init__(self) -> None:
     os = sysname()  # Windows | Linux | Darwin
 

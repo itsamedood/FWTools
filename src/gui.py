@@ -9,6 +9,8 @@ from util import Util
 class GUI(Tk):
   """ GUI for FWTools! """
 
+  frame_stack: list[str] = []
+
   def __init__(self, *args, **kwargs) -> None:
     Tk.__init__(self, *args, **kwargs)
     self.bind("<Key>", self.on_esc)
@@ -20,7 +22,7 @@ class GUI(Tk):
     self.attributes("-alpha", 0.8)  # Make window a bit transparent.
     self.resizable(False, False)
 
-    icon = ImageTk.PhotoImage(Image.open("assets/logos/FWToolslogo.png"))
+    icon = ImageTk.PhotoImage(Image.open("assets/images/logos/FWToolslogo.png"))
     self.iconphoto(True, icon)
 
     # Making the window have a container where frames will go.
@@ -47,11 +49,22 @@ class GUI(Tk):
     self.show_frame("MainFrame")
 
   def show_frame(self, _frame_name: str) -> None:
-    try: self.frames[_frame_name].tkraise()
+    try:
+      self.frame_stack.append(_frame_name)
+      self.frames[_frame_name].tkraise()
+
     except KeyError: raise Exception("%s FRAME DOESN'T EXIST." %_frame_name)
 
   def on_esc(self, _event) -> None:
-    if _event.keysym == "Escape": self.quit()
+    """ Triggered when [Escape] is pressed. """
+
+    if _event.keysym == "Escape":
+      if len(self.frame_stack) < 2 or self.frame_stack[-1] == "SelectedFrame": self.quit()
+      else:
+        # I'm ashamed to admit this took like 20 minutes...
+        self.frame_stack.pop()
+        self.show_frame(self.frame_stack[-1])
+        self.frame_stack.pop()
 
   def err(self, _title: str, _message: str, _close=False) -> str:
     """ Creates a smaller error window to display `_message`. """
