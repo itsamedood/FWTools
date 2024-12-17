@@ -79,27 +79,6 @@ class GUI(Tk):
 
     return messagebox.askokcancel(_title, _message)
 
-  def format_save(self) -> None:
-    """
-    Makes your save easier to read.
-    """
-
-    ...
-
-  def reset_save(self) -> None:
-    """
-    Resets your save back to what you would
-    see if you just started a new save file.
-    """
-
-    ...
-
-  def onefiftyseven(self) -> None:
-    if (Util.save.slot == 0): self.err("Error", "Select a slot!")
-    else:
-      if self.confirm("Confirm", "Are you sure you want to override your file to 157%?"):
-        print("set slot %s to 157%% file" %Util.save.slot)
-
   def select_slot(self, _slot: int) -> None:
     Util.save.slot = _slot
     Util.save.spath = f"{Util.save.spath[:-1]}{_slot}"
@@ -134,9 +113,9 @@ def setup_menu(_gui: GUI) -> Menu:
   slot_menu.add_radiobutton(label="Slot 2", command=lambda: gui.select_slot(2))
   slot_menu.add_radiobutton(label="Slot 3", command=lambda: gui.select_slot(3))
   slot_menu.add_separator()
-  slot_menu.add_command(label="Format", command=gui.format_save)
-  slot_menu.add_command(label="Reset", command=gui.reset_save)
-  slot_menu.add_command(label="157%", command=gui.onefiftyseven)
+  slot_menu.add_command(label="Format", command=Util.save.prettify)
+  slot_menu.add_command(label="Reset", command=Util.save.reset)
+  slot_menu.add_command(label="157%", command=lambda: Util.save.onefiftyseven(_gui))
   slot_menu.add_separator()
   slot_menu.add_command(label="Exit", command=gui.quit)
 

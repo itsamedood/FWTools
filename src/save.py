@@ -108,7 +108,7 @@ class Save:
   }
 
   # Changes to be made.
-  staged: tuple[dict[str, int], dict[str, int]]
+  staged: tuple[dict[str, int], dict[str, int]] = (sdata, idata)
 
   def __init__(self) -> None:
     os = sysname()  # Windows | Linux | Darwin
@@ -124,3 +124,21 @@ class Save:
         base_path = f"{getenv("HOME")}/.wine/drive_c/users/{getenv("USERNAME")}/AppData/Roaming/MMFApplications"
         self.spath = f"{base_path}/fnafw{self.slot}"
         self.ipath = "%s/info" %base_path
+
+  def onefiftyseven(self, _controller) -> None:
+    """
+    Unlocks everything in your save, all characters,
+    trophies, areas, chips, bytes, etc.
+    """
+
+    if (self.slot == 0): _controller.err("Error", "Select a slot!")
+    else:
+      if _controller.confirm("Confirm", "Are you sure you want to override your file to 157%?"):
+        print("set slot %s to 157%% file" %self.slot)
+
+  def write_changes(self, _controller) -> None:
+    self.sdata, self.idata = self.staged
+
+  def read(self, _controller) -> None: ...
+  def prettify(self, _controller) -> None: ...
+  def reset(self, _controller) -> None: ...

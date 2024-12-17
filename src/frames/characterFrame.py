@@ -7,6 +7,9 @@ from util import Util
 
 
 class CharacterFrame(Frame):
+
+  LOCKED_ALPHA = 0.4
+
   def __init__(self, _parent: Frame, _controller) -> None:
     Frame.__init__(self, _parent)
     self.controller = _controller
@@ -24,11 +27,13 @@ class CharacterFrame(Frame):
     self.canvas.configure(yscrollcommand=scrollbar.set)
     self.canvas.create_window(0, 0, window=scrollable_frame, anchor="nw")
 
+    ...
+
     # PIL Image, PhotoImage for display, Label that displays the image, and "locked" state.
     self.portrait_imgs: list[tuple[Image.ImageFile.ImageFile, ImageTk.PhotoImage, Label, bool]] = []
     base_path = "assets/images/portraits"
     portraits = [f"{base_path}/{p.name}" for p in scandir(base_path)]
-    row, column = 0, 1
+    row, column = 2, 1
     portraits.sort()  # Well that was easy!
 
     # Add character portraits (5 per row).
@@ -53,7 +58,7 @@ class CharacterFrame(Frame):
       # For now, random chance to be "locked" (lol).
       if randint(1, 5) == 1:
         enhancer = ImageEnhance.Brightness(og_img)
-        locked = enhancer.enhance(0.5)
+        locked = enhancer.enhance(self.LOCKED_ALPHA)
         locked_img = ImageTk.PhotoImage(locked)
 
         lbl.configure(image=locked_img)
@@ -67,13 +72,12 @@ class CharacterFrame(Frame):
     og_img, img, lbl, locked = self.portrait_imgs[_portrait]
     locked = not locked
 
-    limg = ImageTk.PhotoImage(
-      ImageEnhance.Brightness(og_img).enhance(1)) if not locked else ImageTk.PhotoImage(
-        ImageEnhance.Brightness(og_img).enhance(0.5))
-
+    limg = ImageTk.PhotoImage(og_img if not locked else ImageEnhance.Brightness(og_img).enhance(self.LOCKED_ALPHA))
     lbl.configure(image=limg)
 
     self.portrait_imgs[_portrait] = (og_img, limg, lbl, locked)
+    Util.save.staged[0][f"{_portrait}have"] = 0 if locked else 1
+    # print(Util.save.staged[0][f"{_portrait}have"])
 
   def update_scrollregion(self, _e):
     self.canvas.configure(scrollregion=self.canvas.bbox("all"))
