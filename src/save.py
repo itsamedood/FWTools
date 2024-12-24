@@ -1,4 +1,5 @@
 from os import getenv
+from os.path import exists
 from platform import system as sysname
 
 
@@ -124,6 +125,23 @@ class Save:
         base_path = f"{getenv("HOME")}/.wine/drive_c/users/{getenv("USERNAME")}/AppData/Roaming/MMFApplications"
         self.spath = f"{base_path}/fnafw{self.slot}"
         self.ipath = "%s/info" %base_path
+
+  def validate(self, _controller) -> None:
+    """
+    Check if the current save and info files exist.
+    If not, create the file(s).
+
+    Later, maybe write default data to the save, and delete the file
+    if no changes end up being made.
+    """
+
+    if not exists(self.spath):
+      _controller.warn("Warning", f"{self.spath} not found, but will be made now.")
+      with open(self.spath, "w") as f: f.write("")
+
+    if not exists(self.ipath):
+      _controller.warn("Warning", f"{self.ipath} not found, but will be made now.")
+      with open(self.ipath, "w") as f: f.write("")
 
   def onefiftyseven(self, _controller) -> None:
     """

@@ -59,7 +59,7 @@ class GUI(Tk):
     """ Triggered when [Escape] is pressed. """
 
     if _event.keysym == "Escape":
-      if len(self.frame_stack) < 2 or self.frame_stack[-1] == "SelectedFrame": self.quit()
+      if len(self.frame_stack) < 2: self.quit()
       else:
         # I'm ashamed to admit this took like 20 minutes...
         self.frame_stack.pop()
@@ -74,6 +74,11 @@ class GUI(Tk):
 
     return response
 
+  def warn(self, _title: str, _message: str) -> str:
+    """ Creates a warning window. """
+
+    return messagebox.showwarning(_title, _message)
+
   def confirm(self, _title: str, _message: str) -> bool:
     """ Creates a 'are you sure?' window. """
 
@@ -82,6 +87,8 @@ class GUI(Tk):
   def select_slot(self, _slot: int) -> None:
     Util.save.slot = _slot
     Util.save.spath = f"{Util.save.spath[:-1]}{_slot}"
+    Util.save.validate(self)
+
     selected_frame = self.frames["SelectedFrame"]
     selected_frame.update_display()
     self.show_frame("SelectedFrame")
@@ -109,9 +116,9 @@ def setup_menu(_gui: GUI) -> Menu:
 
   # Add things to cascades.
   # File cascade.
-  slot_menu.add_radiobutton(label="Slot 1", command=lambda: gui.select_slot(1))
-  slot_menu.add_radiobutton(label="Slot 2", command=lambda: gui.select_slot(2))
-  slot_menu.add_radiobutton(label="Slot 3", command=lambda: gui.select_slot(3))
+  # slot_menu.add_radiobutton(label="Slot 1", command=lambda: gui.select_slot(1))
+  # slot_menu.add_radiobutton(label="Slot 2", command=lambda: gui.select_slot(2))
+  # slot_menu.add_radiobutton(label="Slot 3", command=lambda: gui.select_slot(3))
   slot_menu.add_separator()
   slot_menu.add_command(label="Format", command=Util.save.prettify)
   slot_menu.add_command(label="Reset", command=Util.save.reset)
