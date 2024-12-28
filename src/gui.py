@@ -92,7 +92,8 @@ class GUI(Tk):
     Util.save.validate(self)
     Util.save.read_all(self)
 
-    self.frames["CharacterFrame"].determine_portraits()  # Ay ay ay.
+    # Set locked characters to have "locked" portraits.
+    self.frames["CharacterFrame"].determine_portraits()
 
     selected_frame = self.frames["SelectedFrame"]
     selected_frame.update_display()
