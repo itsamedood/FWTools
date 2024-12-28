@@ -324,6 +324,37 @@ class Save:
   # Changes to be made.
   staged: tuple[dict[str, int], dict[str, int]] = (sdata, idata)
 
+  default_data = """[fnafw]
+newgame=0
+1have=1
+2have=1
+3have=1
+4have=1
+5have=1
+6have=1
+7have=1
+8have=1
+mode=1
+diff=1
+s1=1
+s2=2
+s3=3
+s4=4
+s5=5
+s6=6
+s7=7
+s8=8
+started=1
+locked=1
+cine=1
+x=1827
+y=1023
+area=0
+seconds=0
+min=0
+hour=0
+"""
+
   def __init__(self) -> None:
     os = sysname()  # Windows | Linux | Darwin
 
@@ -637,7 +668,13 @@ showend=0
   # def read_char_data(self, _controller) -> tuple[dict[str, int], dict[str, int]]: ...
 
   def prettify(self, _controller) -> None: ...
-  def reset(self, _controller) -> None: ...
+  def reset(self, _controller) -> None:
+    """
+    Resets the save file to default values.
+    """
+
+    if _controller.confirm("Are you sure you want to reset this file?"):
+      with open(self.spath, "w") as sfile: sfile.write(self.default_data)
 
   def raise_bad_property(self, _controller, _bad_property: str, _i: int) -> None:
     _controller.err(f"'{_bad_property}' is not a known property ({self.spath}:{_i+1}).")

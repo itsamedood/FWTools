@@ -41,9 +41,13 @@ class CharacterFrame(Frame):
       portrait_img = ImageTk.PhotoImage(og_img)
       portrait_label = Label(scrollable_frame, image=portrait_img)
 
+      # Left click.
       portrait_label.bind("<Button-1>", lambda _e, _i=len(self.portrait_imgs): self.on_portrait_left_click(_i))
-      # Thought button 2 was scroll wheel pressed?
+
+      # Button-2 is scrollwheel-click, and Button-3 is right-click,
+      # but on MacOS Button-2 worked as right-click (trackpad?), so I'll just bind both.
       portrait_label.bind("<Button-2>", lambda _e, _i=len(self.portrait_imgs): self.on_portrait_right_click(_i))
+      portrait_label.bind("<Button-3>", lambda _e, _i=len(self.portrait_imgs): self.on_portrait_right_click(_i))
 
       self.portrait_imgs.append((og_img, portrait_img, portrait_label, False))
 
@@ -60,11 +64,23 @@ class CharacterFrame(Frame):
     scrollable_frame.bind("<Configure>", self.update_scrollregion)
     self.canvas.bind_all("<MouseWheel>", self.on_scroll)
 
+    # Instructions.
     left_click_label = Label(scrollable_frame, text="Left-click to toggle locked/unlocked.", font=("Futura", 12))
     right_click_label = Label(scrollable_frame, text="Right-click to set level and XP.", font=("Futura", 12))
 
     left_click_label.grid(row=2, column=6, columnspan=5)
     right_click_label.grid(row=3, column=6, columnspan=5)
+
+    # Save changes button.
+    save_button = Button(scrollable_frame, text="Save Changes", command=self.on_save, font=("Futura", 18))
+
+    save_button.grid(row=4, column=6, columnspan=5, pady=10)
+
+  def on_save(self) -> None:
+    """ Save changes to the save file. """
+
+    # Will actually write the changes to the save file, too lazy for now.
+    self.controller.success("Changes saved!", True)
 
   def determine_portraits(self) -> None:
     """ Make locked characters more transparent, and unlocked, leave alone. """
@@ -89,9 +105,14 @@ class CharacterFrame(Frame):
 
   def on_portrait_right_click(self, _portrait: int):
     """
-    Triggers when a portrait is right-clicked on.
+    Triggers when a portrait is right-clicked on (and that character is unlocked).
     Will bring up a smaller menu for setting character levels and XP to next level.
     """
+
+    # Petty moment.
+    if Util.save.sdata[f"{_portrait+1}have"] == 0:
+      self.controller.err("Character is locked!")
+      return
 
     # Create a new top-level window.
     def on_esc(_e):  # So you can use Escape to close the top-level window.

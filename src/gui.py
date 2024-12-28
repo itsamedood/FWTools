@@ -60,13 +60,17 @@ class GUI(Tk):
   def on_esc(self, _event) -> None:
     """ Triggered when [Escape] is pressed. """
 
-    if _event.keysym == "Escape":
-      if len(self.frame_stack) < 2: self.quit()
-      else:
-        # I'm ashamed to admit this took like 20 minutes...
-        self.frame_stack.pop()
-        self.show_frame(self.frame_stack[-1])
-        self.frame_stack.pop()
+    if _event.keysym == "Escape": self.back_a_frame()
+
+  def back_a_frame(self) -> None:
+    """ Go back a frame. """
+
+    if len(self.frame_stack) < 2: self.quit()
+    else:
+      # I'm ashamed to admit this took like 20 minutes...
+      self.frame_stack.pop()
+      self.show_frame(self.frame_stack[-1])
+      self.frame_stack.pop()
 
   def err(self, _message: str, _close=False) -> str:
     """ Creates a smaller error window to display `_message`. """
@@ -86,10 +90,13 @@ class GUI(Tk):
 
     return messagebox.askokcancel("Are you sure?", _message)
 
-  def success(self, _message="Operation successful!") -> str:
+  def success(self, _message="Operation successful!", _back=False) -> str:
     """ Creates a success window. """
 
-    return messagebox.showinfo("Success", _message)
+    infomsg = messagebox.showinfo("Success", _message)
+    if _back: self.back_a_frame()
+
+    return infomsg
 
   def select_slot(self, _slot: int) -> None:
     Util.save.slot = _slot
@@ -103,14 +110,6 @@ class GUI(Tk):
     selected_frame = self.frames["SelectedFrame"]
     selected_frame.update_display()
     self.show_frame("SelectedFrame")
-
-  # def select_slot_one(self):
-  #   self.selected_slot = 1
-
-  # def select_slot_two(self): self.selected_slot = 2
-
-  # def select_slot_tre(self): self.selected_slot = 3
-
 
 def setup_menu(_gui: GUI) -> Menu:
   menu = Menu(_gui)
@@ -131,8 +130,8 @@ def setup_menu(_gui: GUI) -> Menu:
   # slot_menu.add_radiobutton(label="Slot 2", command=lambda: gui.select_slot(2))
   # slot_menu.add_radiobutton(label="Slot 3", command=lambda: gui.select_slot(3))
   slot_menu.add_separator()
-  slot_menu.add_command(label="Format", command=Util.save.prettify)
-  slot_menu.add_command(label="Reset", command=Util.save.reset)
+  slot_menu.add_command(label="Format", command=lambda: Util.save.prettify(_gui))
+  slot_menu.add_command(label="Reset", command=lambda: Util.save.reset(_gui))
   slot_menu.add_command(label="157%", command=lambda: Util.save.onefiftyseven(_gui))
   slot_menu.add_separator()
   slot_menu.add_command(label="Exit", command=gui.quit)
