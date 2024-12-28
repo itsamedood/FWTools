@@ -7,6 +7,7 @@ from util import Util
 
 
 class CharacterFrame(Frame):
+  """ Select characters to mark as locked (transparent) or unlocked. """
 
   LOCKED_ALPHA = 0.4
 
@@ -27,8 +28,6 @@ class CharacterFrame(Frame):
     self.canvas.configure(yscrollcommand=scrollbar.set)
     self.canvas.create_window(0, 0, window=scrollable_frame, anchor="nw")
 
-    ...
-
     # PIL Image, PhotoImage for display, Label that displays the image, and "locked" state.
     self.portrait_imgs: list[tuple[Image.ImageFile.ImageFile, ImageTk.PhotoImage, Label, bool]] = []
     base_path = "assets/images/portraits"
@@ -46,6 +45,7 @@ class CharacterFrame(Frame):
 
       self.portrait_imgs.append((og_img, portrait_img, portrait_label, False))
 
+    # Organizes the portraits, 5 per column.
     for og_img, img, lbl, locked in self.portrait_imgs:
       lbl.grid(row=row, column=column)
       if column % 5 == 0:
@@ -53,19 +53,30 @@ class CharacterFrame(Frame):
         column = 1
       else: column += 1
 
-    # Make locked characters more transparent, and unlocked, leave alone.
-    for i, (og_img, img, lbl, locked) in enumerate(self.portrait_imgs):
-      # For now, random chance to be "locked" (lol).
-      if randint(1, 5) == 1:
-        enhancer = ImageEnhance.Brightness(og_img)
-        locked = enhancer.enhance(self.LOCKED_ALPHA)
-        locked_img = ImageTk.PhotoImage(locked)
+    self.determine_portraits()
 
-        lbl.configure(image=locked_img)
-        self.portrait_imgs[i] = (og_img, locked_img, lbl, True)
+    # Make locked characters more transparent, and unlocked, leave alone.
+    # for i, (og_img, img, lbl, locked) in enumerate(self.portrait_imgs):
+    #   if Util.save.sdata[f"{i+1}have"] == 0:  # Change this condition!
+    #     enhancer = ImageEnhance.Brightness(og_img)
+    #     locked = enhancer.enhance(self.LOCKED_ALPHA)
+    #     locked_img = ImageTk.PhotoImage(locked)
+
+    #     lbl.configure(image=locked_img)
+    #     self.portrait_imgs[i] = (og_img, locked_img, lbl, True)
 
     scrollable_frame.bind("<Configure>", self.update_scrollregion)
     self.canvas.bind_all("<MouseWheel>", self.on_scroll)
+
+  def determine_portraits(self) -> None:
+    """ Make locked characters more transparent, and unlocked, leave alone. """
+
+    for i, (og_img, img, lbl, locked) in enumerate(self.portrait_imgs):
+      locked = Util.save.sdata[f"{i+1}have"] == 0
+      limg = ImageTk.PhotoImage(og_img if not locked else ImageEnhance.Brightness(og_img).enhance(self.LOCKED_ALPHA))
+
+      lbl.configure(image=limg)
+      self.portrait_imgs[i] = (og_img, limg, lbl, locked)
 
   def on_portrait_click(self, _portrait: int):
     """ Triggers when a portrait is clicked on. Toggles "locked" (transparent) or "unlocked". """
@@ -77,7 +88,6 @@ class CharacterFrame(Frame):
 
     self.portrait_imgs[_portrait] = (og_img, limg, lbl, locked)
     Util.save.staged[0][f"{_portrait}have"] = 0 if locked else 1
-    # print(Util.save.staged[0][f"{_portrait}have"])
 
   def update_scrollregion(self, _e):
     self.canvas.configure(scrollregion=self.canvas.bbox("all"))

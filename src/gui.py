@@ -13,6 +13,8 @@ class GUI(Tk):
 
   def __init__(self, *args, **kwargs) -> None:
     Tk.__init__(self, *args, **kwargs)
+    Util.isgui = True
+
     self.bind("<Key>", self.on_esc)
 
     # Initialize main window.
@@ -66,28 +68,31 @@ class GUI(Tk):
         self.show_frame(self.frame_stack[-1])
         self.frame_stack.pop()
 
-  def err(self, _title: str, _message: str, _close=False) -> str:
+  def err(self, _message: str, _close=False) -> str:
     """ Creates a smaller error window to display `_message`. """
 
-    response = messagebox.showerror(_title, _message)
+    response = messagebox.showerror("Error", _message)
     if _close: self.destroy()
 
     return response
 
-  def warn(self, _title: str, _message: str) -> str:
+  def warn(self, _message: str) -> str:
     """ Creates a warning window. """
 
-    return messagebox.showwarning(_title, _message)
+    return messagebox.showwarning("Warning", _message)
 
-  def confirm(self, _title: str, _message: str) -> bool:
+  def confirm(self, _message: str) -> bool:
     """ Creates a 'are you sure?' window. """
 
-    return messagebox.askokcancel(_title, _message)
+    return messagebox.askokcancel("Are you sure?", _message)
 
   def select_slot(self, _slot: int) -> None:
     Util.save.slot = _slot
     Util.save.spath = f"{Util.save.spath[:-1]}{_slot}"
     Util.save.validate(self)
+    Util.save.read_all(self)
+
+    self.frames["CharacterFrame"].determine_portraits()  # Ay ay ay.
 
     selected_frame = self.frames["SelectedFrame"]
     selected_frame.update_display()
@@ -130,7 +135,7 @@ def setup_menu(_gui: GUI) -> Menu:
   extra_menu.add_command(label="Replay First Cutscene", command=lambda: print("set first=0 in info"))
 
   # Debug cascade.
-  debug_menu.add_command(label="Show Selected Slot", command=lambda: gui.err("Selected Slot:", f"{Util.save.spath}"))
+  debug_menu.add_command(label="Show Selected Slot", command=lambda: gui.err(f"{Util.save.spath}"))
 
   return menu
 
