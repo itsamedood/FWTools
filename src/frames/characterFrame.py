@@ -60,6 +60,12 @@ class CharacterFrame(Frame):
     scrollable_frame.bind("<Configure>", self.update_scrollregion)
     self.canvas.bind_all("<MouseWheel>", self.on_scroll)
 
+    left_click_label = Label(scrollable_frame, text="Left-click to toggle locked/unlocked.", font=("Futura", 12))
+    right_click_label = Label(scrollable_frame, text="Right-click to set level and XP.", font=("Futura", 12))
+
+    left_click_label.grid(row=2, column=6, columnspan=5)
+    right_click_label.grid(row=3, column=6, columnspan=5)
+
   def determine_portraits(self) -> None:
     """ Make locked characters more transparent, and unlocked, leave alone. """
 
