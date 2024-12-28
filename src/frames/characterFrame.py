@@ -2,7 +2,7 @@ from os import scandir
 from platform import system
 from PIL import Image, ImageTk, ImageEnhance
 from random import randint
-from tkinter import Canvas, Event, Frame, Label, Scrollbar
+from tkinter import Canvas, Event, Frame, Label, Scrollbar, Toplevel, Entry, Button
 from util import Util
 
 
@@ -41,7 +41,9 @@ class CharacterFrame(Frame):
       portrait_img = ImageTk.PhotoImage(og_img)
       portrait_label = Label(scrollable_frame, image=portrait_img)
 
-      portrait_label.bind("<Button-1>", lambda _e, _i=len(self.portrait_imgs): self.on_portrait_click(_i))
+      portrait_label.bind("<Button-1>", lambda _e, _i=len(self.portrait_imgs): self.on_portrait_left_click(_i))
+      # Thought button 2 was scroll wheel pressed?
+      portrait_label.bind("<Button-2>", lambda _e, _i=len(self.portrait_imgs): self.on_portrait_right_click(_i))
 
       self.portrait_imgs.append((og_img, portrait_img, portrait_label, False))
 
@@ -54,16 +56,6 @@ class CharacterFrame(Frame):
       else: column += 1
 
     self.determine_portraits()
-
-    # Make locked characters more transparent, and unlocked, leave alone.
-    # for i, (og_img, img, lbl, locked) in enumerate(self.portrait_imgs):
-    #   if Util.save.sdata[f"{i+1}have"] == 0:  # Change this condition!
-    #     enhancer = ImageEnhance.Brightness(og_img)
-    #     locked = enhancer.enhance(self.LOCKED_ALPHA)
-    #     locked_img = ImageTk.PhotoImage(locked)
-
-    #     lbl.configure(image=locked_img)
-    #     self.portrait_imgs[i] = (og_img, locked_img, lbl, True)
 
     scrollable_frame.bind("<Configure>", self.update_scrollregion)
     self.canvas.bind_all("<MouseWheel>", self.on_scroll)
@@ -78,7 +70,7 @@ class CharacterFrame(Frame):
       lbl.configure(image=limg)
       self.portrait_imgs[i] = (og_img, limg, lbl, locked)
 
-  def on_portrait_click(self, _portrait: int):
+  def on_portrait_left_click(self, _portrait: int):
     """ Triggers when a portrait is clicked on. Toggles "locked" (transparent) or "unlocked". """
     og_img, img, lbl, locked = self.portrait_imgs[_portrait]
     locked = not locked
@@ -88,6 +80,47 @@ class CharacterFrame(Frame):
 
     self.portrait_imgs[_portrait] = (og_img, limg, lbl, locked)
     Util.save.staged[0][f"{_portrait}have"] = 0 if locked else 1
+
+  def on_portrait_right_click(self, _portrait: int):
+    """
+    Triggers when a portrait is right-clicked on.
+    Will bring up a smaller menu for setting character levels and XP to next level.
+    """
+
+    # Create a new top-level window.
+    def on_esc(_e):  # So you can use Escape to close the top-level window.
+      if _e.keysym == "Escape": top.destroy()
+
+    top = Toplevel(self)
+    top.title(f"Set Level and XP (character {_portrait+1})")
+    top.geometry("365x150")
+    top.resizable(False, False)
+    top.attributes("-alpha", 0.95)
+    top.bind("<Key>", on_esc)
+
+    # Level entry.
+    Label(top, text="Level:", font=("Futura", 12)).grid(row=0, column=0, padx=5, pady=5)
+    level_entry = Entry(top)
+    level_entry.grid(row=0, column=1, padx=5, pady=5)
+
+    # XP entry.
+    Label(top, text="XP to next level (0=100):", font=("Futura", 12)).grid(row=1, column=0, padx=5, pady=5)
+    xp_entry = Entry(top)
+    xp_entry.grid(row=1, column=1, padx=5, pady=5)
+
+    def save_changes():
+      try:
+        level = int(level_entry.get())
+        xp = int(xp_entry.get())
+        Util.save.staged[0][f"{_portrait}lv"] = level
+        Util.save.staged[0][f"{_portrait}next"] = xp
+        top.destroy()
+
+        self.controller.success("Changes saved!")
+      except ValueError: self.controller.err("Level and XP must be integers!")
+
+    # Save button
+    Button(top, text="Save", command=save_changes).grid(row=2, column=0, columnspan=2, pady=10)
 
   def update_scrollregion(self, _e):
     self.canvas.configure(scrollregion=self.canvas.bbox("all"))

@@ -86,6 +86,11 @@ class GUI(Tk):
 
     return messagebox.askokcancel("Are you sure?", _message)
 
+  def success(self, _message="Operation successful!") -> str:
+    """ Creates a success window. """
+
+    return messagebox.showinfo("Success", _message)
+
   def select_slot(self, _slot: int) -> None:
     Util.save.slot = _slot
     Util.save.spath = f"{Util.save.spath[:-1]}{_slot}"
